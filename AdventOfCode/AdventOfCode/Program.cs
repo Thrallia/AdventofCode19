@@ -24,9 +24,39 @@ namespace AdventOfCode
 			int count = 0;
 			while (min < max)
 			{
-				var digits = NumbersIn(min).ToArray();
+				string comp = min.ToString();
+				if (comp.Contains("00") || comp.Contains("11") || comp.Contains("22") ||
+					comp.Contains("33") || comp.Contains("44") || comp.Contains("55") ||
+					comp.Contains("66") || comp.Contains("77") || comp.Contains("88") || comp.Contains("99"))
+				{
+					var digits = comp.ToCharArray(); //NumbersIn(min).ToArray();
+					bool desc = false;
+					for (int i = 1; i < digits.Length; i++)
+					{
+						if (digits[i] - digits[i - 1] < 0)
+						{
+							desc = true;
+							break;
+						}
+
+						if (i > 1)
+						{
+							if ((digits[i] - digits[i - 1] == 0) && (digits[i - 1] - digits[i - 2] == 0))
+							{
+								desc = true;
+								break;
+							}
+						}
+					}
+
+					if (!desc)
+						count++;
+				}
+
 				min++;
 			}
+			Console.WriteLine(count);
+			Console.ReadKey();
 		}
 
 		private static List<int> IntCode(string path)
