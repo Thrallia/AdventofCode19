@@ -12,17 +12,8 @@ namespace AdventOfCode
 		static void Main(string[] args)
 		{
 			//Aoc1();
-			AoC2();
-		}
-
-
-		static int calcFuel(double mass)
-		{
-			int fuel = (int)Math.Floor(mass / 3) - 2;
-			if (fuel < 0)
-				return 0;
-			else
-				return fuel;
+			//AoC2();
+			AoC4(235741, 706948);
 		}
 
 		private static List<int> IntCode(string path)
@@ -42,10 +33,41 @@ namespace AdventOfCode
 			return positions;
 		}
 
+		static int calcFuel(double mass)
+		{
+			int fuel = (int)Math.Floor(mass / 3) - 2;
+			if (fuel < 0)
+				return 0;
+			else
+				return fuel;
+		}
+
+		private static Stack<int> NumbersIn(int value)
+		{
+			if (value == 0) return new Stack<int>();
+
+			var numbers = NumbersIn(value / 10);
+
+			numbers.Push(value % 10);
+
+			return numbers;
+		}
+
+		private static void AoC4(int min, int max)
+		{
+			int count = 0;
+			while (min < max)
+			{
+				var digits = NumbersIn(min).ToArray();
+				min++;
+			}
+
+		}
+
 		private static void AoC2()
 		{
 
-			string file = @"C:\Users\Thrallia\Documents\Projects\AdventOfCode\inputs\AoC2.txt";
+			string file = @"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt";
 			List<int> positions = IntCode(file);
 
 			int index = 0;
@@ -76,7 +98,7 @@ namespace AdventOfCode
 				}
 				positions[address] = output;
 				index += 4;
-				
+
 
 			}
 			while (positions[index] != 99);
@@ -84,7 +106,7 @@ namespace AdventOfCode
 			grav = 100 * positions[1] + positions[2];
 			if (positions[0] == 19690720)
 				Console.WriteLine(grav);
-			
+
 
 			Console.WriteLine("address 0: " + positions[0]);
 			Console.WriteLine("gravity assist: " + grav);
@@ -94,7 +116,7 @@ namespace AdventOfCode
 		private static void Aoc1()
 		{
 			int total = 0;
-			using (StreamReader file = new StreamReader(@"C:\Users\Thrallia\Documents\Projects\AdventOfCode\inputs\AoC1.txt"))
+			using (StreamReader file = new StreamReader(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC1.txt"))
 			{
 				string line = "";
 				while ((line = file.ReadLine()) != null)
