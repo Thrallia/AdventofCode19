@@ -1,6 +1,0 @@
-C:\Users\Thrallia\Documents\Projects\AdventOfCode\AdventOfCode\bin\Debug\AdventOfCode.exe.config
-C:\Users\Thrallia\Documents\Projects\AdventOfCode\AdventOfCode\bin\Debug\AdventOfCode.exe
-C:\Users\Thrallia\Documents\Projects\AdventOfCode\AdventOfCode\bin\Debug\AdventOfCode.pdb
-C:\Users\Thrallia\Documents\Projects\AdventOfCode\AdventOfCode\obj\Debug\AdventOfCode.csprojAssemblyReference.cache
-C:\Users\Thrallia\Documents\Projects\AdventOfCode\AdventOfCode\obj\Debug\AdventOfCode.exe
-C:\Users\Thrallia\Documents\Projects\AdventOfCode\AdventOfCode\obj\Debug\AdventOfCode.pdb
