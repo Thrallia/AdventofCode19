@@ -3,3 +3,6 @@
 ################################################################################
 
 /AdventOfCode/.vs/AdventOfCode/v16/Server/sqlite3
+/AdventOfCode/.vs/AdventOfCode/v16
+/AdventOfCode/bin
+/AdventOfCode/obj

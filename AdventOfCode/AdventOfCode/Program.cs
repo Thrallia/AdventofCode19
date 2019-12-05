@@ -13,9 +13,9 @@ namespace AdventOfCode
 	{
 		static void Main(string[] args)
 		{
-			//Aoc1();
-			//AoC2();
-			//AoC3();
+			//Aoc1(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC1.txt");
+			//AoC2(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt");
+			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
 			AoC4(235741, 706948);
 		}
 
@@ -25,30 +25,13 @@ namespace AdventOfCode
 			while (min < max)
 			{
 				string comp = min.ToString();
-				if (comp.Contains("00") || comp.Contains("11") || comp.Contains("22") ||
-					comp.Contains("33") || comp.Contains("44") || comp.Contains("55") ||
-					comp.Contains("66") || comp.Contains("77") || comp.Contains("88") || comp.Contains("99"))
+
+				var digits = comp.ToCharArray();
+
+				bool dub = calcPassGroups(digits);
+				if(dub)
 				{
-					var digits = comp.ToCharArray(); //NumbersIn(min).ToArray();
-					bool desc = false;
-					for (int i = 1; i < digits.Length; i++)
-					{
-						if (digits[i] - digits[i - 1] < 0)
-						{
-							desc = true;
-							break;
-						}
-
-						if (i > 1)
-						{
-							if ((digits[i] - digits[i - 1] == 0) && (digits[i - 1] - digits[i - 2] == 0))
-							{
-								desc = true;
-								break;
-							}
-						}
-					}
-
+					bool desc = calcPassAsc(digits);
 					if (!desc)
 						count++;
 				}
@@ -57,6 +40,27 @@ namespace AdventOfCode
 			}
 			Console.WriteLine(count);
 			Console.ReadKey();
+		}
+
+		private static bool calcPassGroups(char[] digits)
+		{
+			var counts = digits.GroupBy(x => x).Select(x => x.Count());
+			if (counts.Contains(2)) //if(counts.Max > 1) //Part 1
+				return true;
+			else
+				return false;
+		}
+
+		private static bool calcPassAsc(char[] digits)
+		{
+			for (int i = 1; i < digits.Length; i++)
+			{
+				if (digits[i] - digits[i - 1] < 0)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private static List<int> IntCode(string path)
@@ -74,6 +78,19 @@ namespace AdventOfCode
 				}
 			}
 			return positions;
+		}
+
+		public static int CountPatterns(string text, string pattern)
+		{
+			// Loop through all instances of the string 'text'.
+			int count = 0;
+			int i = 0;
+			while ((i = text.IndexOf(pattern, i)) != -1)
+			{
+				i += pattern.Length;
+				count++;
+			}
+			return count;
 		}
 
 		private static List<Point> CalcPath(List<string> moves)
@@ -119,25 +136,14 @@ namespace AdventOfCode
 				return fuel;
 		}
 
-		private static Stack<int> NumbersIn(int value)
-		{
-			if (value == 0) return new Stack<int>();
-
-			var numbers = NumbersIn(value / 10);
-
-			numbers.Push(value % 10);
-
-			return numbers;
-		}
-		
-		private static void AoC3()
+		private static void AoC3(string path)
 		{
 			List<string> wires = new List<string>();
 			List<string> moves1 = new List<string>();
 			List<string> moves2 = new List<string>();
 			List<Point> wire1 = new List<Point>();
 			List<Point> wire2 = new List<Point>();
-			using (StreamReader file = new StreamReader(@"C:\develop\AdventofCode\inputs\AoC3.txt"))
+			using (StreamReader file = new StreamReader(path))
 			{
 				while (!file.EndOfStream)
 				{
@@ -173,11 +179,9 @@ namespace AdventOfCode
 			Console.ReadKey();
 		}
 
-		private static void AoC2()
+		private static void AoC2(string path)
 		{
-
-			string file = @"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt";
-			List<int> positions = IntCode(file);
+			List<int> positions = IntCode(path);
 
 			int index = 0;
 			int noun;
@@ -222,10 +226,10 @@ namespace AdventOfCode
 			Console.ReadKey();
 		}
 
-		private static void Aoc1()
+		private static void Aoc1(string path)
 		{
 			int total = 0;
-			using (StreamReader file = new StreamReader(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC1.txt"))
+			using (StreamReader file = new StreamReader(path))
 			{
 				string line = "";
 				while ((line = file.ReadLine()) != null)
