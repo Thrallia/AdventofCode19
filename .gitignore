@@ -4,5 +4,5 @@
 
 /AdventOfCode/.vs/AdventOfCode/v16/Server/sqlite3
 /AdventOfCode/.vs/AdventOfCode/v16
-/AdventOfCode/bin
-/AdventOfCode/obj
+/AdventOfCode/AdventOfCode/bin/Debug
+/AdventOfCode/AdventOfCode/obj/Debug
