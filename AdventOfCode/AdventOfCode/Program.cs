@@ -16,30 +16,63 @@ namespace AdventOfCode
 			//Aoc1(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC1.txt");
 			//AoC2(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt");
 			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
-			AoC4(235741, 706948);
+			//AoC4(235741, 706948);
+			AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
 		}
 
-		private static void AoC4(int min, int max)
+		private static void AoC5(string path)
 		{
-			int count = 0;
-			while (min < max)
+			List<int> positions = IntCode(path);
+
+			int index = 0;
+			int noun;
+			int verb;
+			int address;
+			int op;
+			int output = 0;
+			int grav = 0;
+
+			do
 			{
-				string comp = min.ToString();
+				op = positions[index];
+				noun = positions[index + 1];
+				verb = positions[index + 2];
+				address = positions[index + 3];
 
-				var digits = comp.ToCharArray();
-
-				bool dub = calcPassGroups(digits);
-				if(dub)
+				switch (op)
 				{
-					bool desc = calcPassAsc(digits);
-					if (!desc)
-						count++;
+					case 1:
+						positions[address] = positions[noun] + positions[verb];
+						break;
+					case 2:
+						positions[address] = positions[noun] * positions[verb];
+						break;
+					case 3:
+						break;
+					case 4:
+						break;
+					case 99: break;
+					default: break;
 				}
-
-				min++;
 			}
-			Console.WriteLine(count);
-			Console.ReadKey();
+			while (positions[index] != 99);
+		}
+
+		private static List<int> IntCode(string path)
+		{
+
+			List<int> positions = new List<int>();
+			using (StreamReader file = new StreamReader(path))
+			{
+				string line = file.ReadToEnd();
+				var pos = line.Split(',');
+				foreach (string p in pos)
+				{
+					positions.Add(Int32.Parse(p));
+					//Console.WriteLine(p);
+				}
+			}
+			return positions;
 		}
 
 		private static bool calcPassGroups(char[] digits)
@@ -61,23 +94,6 @@ namespace AdventOfCode
 				}
 			}
 			return false;
-		}
-
-		private static List<int> IntCode(string path)
-		{
-
-			List<int> positions = new List<int>();
-			using (StreamReader file = new StreamReader(path))
-			{
-				string line = file.ReadToEnd();
-				var pos = line.Split(',');
-				foreach (string p in pos)
-				{
-					positions.Add(Int32.Parse(p));
-					//Console.WriteLine(p);
-				}
-			}
-			return positions;
 		}
 
 		public static int CountPatterns(string text, string pattern)
@@ -134,6 +150,29 @@ namespace AdventOfCode
 				return 0;
 			else
 				return fuel;
+		}
+
+		private static void AoC4(int min, int max)
+		{
+			int count = 0;
+			while (min < max)
+			{
+				string comp = min.ToString();
+
+				var digits = comp.ToCharArray();
+
+				bool dub = calcPassGroups(digits);
+				if (dub)
+				{
+					bool desc = calcPassAsc(digits);
+					if (!desc)
+						count++;
+				}
+
+				min++;
+			}
+			Console.WriteLine(count);
+			Console.ReadKey();
 		}
 
 		private static void AoC3(string path)
