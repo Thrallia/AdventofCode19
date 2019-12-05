@@ -17,7 +17,7 @@ namespace AdventOfCode
 			//AoC2(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt");
 			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
 			//AoC4(235741, 706948);
-			AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
+			AoC5(@"C:\develop\AdventofCode\inputs\AoC5.txt");
 		}
 
 		private static void AoC5(string path)
@@ -28,34 +28,83 @@ namespace AdventOfCode
 			int noun;
 			int verb;
 			int address;
-			int op;
+			int opcode;
+
 			int output = 0;
-			int grav = 0;
 
 			do
 			{
-				op = positions[index];
+				opcode = positions[index];
 				noun = positions[index + 1];
 				verb = positions[index + 2];
-				address = positions[index + 3];
 
-				switch (op)
+				switch (opcode)
 				{
+					case 1001:
+						address = positions[index + 3];
+						positions[address] = positions[noun] + verb;
+						index += 4;
+						break;
+					case 1101:
+						address = positions[index + 3];
+						positions[address] = noun + verb;
+						index += 4;
+						break;
+					case 1002:
+						address = positions[index + 3];
+						positions[address] = positions[noun] * verb;
+						index += 4;
+						break;
+					case 1102:
+						address = positions[index + 3];
+						positions[address] = noun * verb;
+						index += 4;
+						break;
+					case 101:
+						address = positions[index + 3];
+						positions[address] = noun + positions[verb];
+						index += 4;
+						break;
+					case 102:
+						address = positions[index + 3];
+						positions[address] = noun * positions[verb];
+						index += 4;
+						break;
 					case 1:
+						address = positions[index + 3];
 						positions[address] = positions[noun] + positions[verb];
+						index += 4;
 						break;
 					case 2:
+						address = positions[index + 3];
 						positions[address] = positions[noun] * positions[verb];
+						index += 4;
 						break;
 					case 3:
+						address = positions[index + 1];
+						var input = Console.ReadLine();
+						positions[address] =Int32.Parse(input);
+						index += 2;
 						break;
 					case 4:
+						address = positions[index + 1];
+						output = positions[address];
+						Console.WriteLine(output);
+						index += 2;
+						break;
+					case 104:
+						address = positions[index + 1];
+						output = address;
+						Console.WriteLine(output);
+						index += 2;
 						break;
 					case 99: break;
 					default: break;
 				}
 			}
 			while (positions[index] != 99);
+
+			Console.ReadKey();
 		}
 
 		private static List<int> IntCode(string path)
@@ -94,19 +143,6 @@ namespace AdventOfCode
 				}
 			}
 			return false;
-		}
-
-		public static int CountPatterns(string text, string pattern)
-		{
-			// Loop through all instances of the string 'text'.
-			int count = 0;
-			int i = 0;
-			while ((i = text.IndexOf(pattern, i)) != -1)
-			{
-				i += pattern.Length;
-				count++;
-			}
-			return count;
 		}
 
 		private static List<Point> CalcPath(List<string> moves)
@@ -250,8 +286,6 @@ namespace AdventOfCode
 				}
 				positions[address] = output;
 				index += 4;
-
-
 			}
 			while (positions[index] != 99);
 
@@ -283,8 +317,6 @@ namespace AdventOfCode
 						total += extra;
 						fuel = extra;
 					}
-
-
 				}
 				Console.WriteLine(total);
 			}
