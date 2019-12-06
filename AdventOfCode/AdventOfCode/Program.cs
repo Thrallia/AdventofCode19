@@ -18,7 +18,7 @@ namespace AdventOfCode
 			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
 			//AoC4(235741, 706948);
 			//AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
-			AoC6(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC6.txt");
+			AoC6(@"C:\develop\AdventofCode\inputs\AoC6.txt");
 		}
 
 		private static void AoC6(string path)
@@ -27,10 +27,37 @@ namespace AdventOfCode
 			using (StreamReader file = new StreamReader(path))
 			{
 				string line = "";
+
+				List<Orb> orbitals = new List<Orb>();
+				orbitals.Add(new Orb("COM"));
 				while (!file.EndOfStream)
 				{
+					line = file.ReadLine();
+
+					var orbs = line.Split(')');
+
+					orbitals.Add(new Orb(orbs[1],orbs[0]));
 				}
+
+				Console.ReadKey();
 			}
+		}
+
+		internal class Orb
+		{
+			public string name;
+			public string primary;
+
+			public Orb(string name, string primary = null)
+			{
+				this.name = name;
+				this.primary = primary;
+			}
+		}
+
+		private static int Orbits(Orb orb)
+		{
+
 		}
 
 		private static int IntCodeComputer(List<int> positions)
