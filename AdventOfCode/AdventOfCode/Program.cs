@@ -17,7 +17,7 @@ namespace AdventOfCode
 			//AoC2(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt");
 			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
 			//AoC4(235741, 706948);
-			AoC5(@"C:\develop\AdventofCode\inputs\AoC5.txt");
+			AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
 		}
 
 		private static void AoC5(string path)
@@ -83,7 +83,7 @@ namespace AdventOfCode
 					case 3:
 						address = positions[index + 1];
 						var input = Console.ReadLine();
-						positions[address] =Int32.Parse(input);
+						positions[address] = Int32.Parse(input);
 						index += 2;
 						break;
 					case 4:
@@ -97,6 +97,118 @@ namespace AdventOfCode
 						output = address;
 						Console.WriteLine(output);
 						index += 2;
+						break;
+					case 5:
+						if (positions[noun] != 0)
+							index = positions[verb];
+						else
+							index += 3;
+						break;
+					case 105:
+						if (noun != 0)
+							index = positions[verb];
+						else
+							index += 3;
+						break;
+					case 1005:
+						if (positions[noun] != 0)
+							index = verb;
+						else
+							index += 3;
+						break;
+					case 1105:
+						if (noun != 0)
+							index = verb;
+						else
+							index += 3;
+						break;
+					case 6:
+						if (positions[noun] == 0)
+							index = positions[verb];
+						else
+							index += 3;
+						break;
+					case 106:
+						if (noun == 0)
+							index = positions[verb];
+						else
+							index += 3;
+						break;
+					case 1006:
+						if (positions[noun] == 0)
+							index = verb;
+						else
+							index += 3;
+						break;
+					case 1106:
+						if (noun == 0)
+							index = verb;
+						else
+							index += 3;
+						break;
+					case 7:
+						address = positions[index + 3];
+						if (positions[noun] < positions[verb])
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
+						break;
+					case 107:
+						address = positions[index + 3];
+						if (noun < positions[verb])
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
+						break;
+					case 1007:
+						address = positions[index + 3];
+						if (positions[noun] < verb)
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
+						break;
+					case 1107:
+						address = positions[index + 3];
+						if (noun < verb)
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
+						break;
+					case 8:
+						address = positions[index + 3];
+						if (positions[noun] == positions[verb])
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
+						break;
+					case 108:
+						address = positions[index + 3];
+						if (noun == positions[verb])
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
+						break;
+					case 1008:
+						address = positions[index + 3];
+						if (positions[noun] == verb)
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
+						break;
+					case 1108:
+						address = positions[index + 3];
+						if (noun == verb)
+							positions[address] = 1;
+						else
+							positions[address] = 0;
+						index += 4;
 						break;
 					case 99: break;
 					default: break;
