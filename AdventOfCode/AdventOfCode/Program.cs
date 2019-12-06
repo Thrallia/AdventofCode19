@@ -17,13 +17,11 @@ namespace AdventOfCode
 			//AoC2(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt");
 			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
 			//AoC4(235741, 706948);
-			AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
+			//AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
 		}
 
-		private static void AoC5(string path)
+		private static int IntCodeComputer(List<int> positions)
 		{
-			List<int> positions = IntCode(path);
-
 			int index = 0;
 			int noun;
 			int verb;
@@ -216,10 +214,10 @@ namespace AdventOfCode
 			}
 			while (positions[index] != 99);
 
-			Console.ReadKey();
+			return positions[0];
 		}
 
-		private static List<int> IntCode(string path)
+		private static List<int> IntCodeInput(string path)
 		{
 
 			List<int> positions = new List<int>();
@@ -300,6 +298,14 @@ namespace AdventOfCode
 				return fuel;
 		}
 
+		private static void AoC5(string path)
+		{
+			List<int> positions = IntCodeInput(path);
+			IntCodeComputer(positions);
+
+			Console.ReadKey();
+		}
+
 		private static void AoC4(int min, int max)
 		{
 			int count = 0;
@@ -368,45 +374,15 @@ namespace AdventOfCode
 
 		private static void AoC2(string path)
 		{
-			List<int> positions = IntCode(path);
+			List<int> positions = IntCodeInput(path);
 
-			int index = 0;
-			int noun;
-			int verb;
-			int address;
-			int op;
-			int output = 0;
-			int grav = 0;
+			int output = IntCodeComputer(positions);
 
-			do
-			{
-				op = positions[index];
-				noun = positions[index + 1];
-				verb = positions[index + 2];
-				address = positions[index + 3];
-
-				switch (op)
-				{
-					case 1:
-						output = positions[noun] + positions[verb];
-						break;
-					case 2:
-						output = positions[noun] * positions[verb];
-						break;
-					case 99: break;
-					default: break;
-				}
-				positions[address] = output;
-				index += 4;
-			}
-			while (positions[index] != 99);
-
-			grav = 100 * positions[1] + positions[2];
-			if (positions[0] == 19690720)
+			int grav = 100 * positions[1] + positions[2];
+			if (output == 19690720)
 				Console.WriteLine(grav);
 
-
-			Console.WriteLine("address 0: " + positions[0]);
+			Console.WriteLine("address 0: " + output);
 			Console.WriteLine("gravity assist: " + grav);
 			Console.ReadKey();
 		}
@@ -417,8 +393,9 @@ namespace AdventOfCode
 			using (StreamReader file = new StreamReader(path))
 			{
 				string line = "";
-				while ((line = file.ReadLine()) != null)
+				while (!file.EndOfStream)
 				{
+					line = file.ReadLine();
 					double mass = double.Parse(line);
 					int fuel = calcFuel(mass);
 					total += fuel;
