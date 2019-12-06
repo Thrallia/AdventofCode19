@@ -18,6 +18,19 @@ namespace AdventOfCode
 			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
 			//AoC4(235741, 706948);
 			//AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
+			AoC6(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC6.txt");
+		}
+
+		private static void AoC6(string path)
+		{
+			int orbits = 0;
+			using (StreamReader file = new StreamReader(path))
+			{
+				string line = "";
+				while (!file.EndOfStream)
+				{
+				}
+			}
 		}
 
 		private static int IntCodeComputer(List<int> positions)
