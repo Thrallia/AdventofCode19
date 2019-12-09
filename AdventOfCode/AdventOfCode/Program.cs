@@ -18,49 +18,80 @@ namespace AdventOfCode
 			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
 			//AoC4(235741, 706948);
 			//AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
-			AoC6(@"C:\develop\AdventofCode\inputs\AoC6.txt");
+			//AoC6(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC6.txt");
+			AoC7(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC7.txt");
 		}
 
-		private static void AoC6(string path)
+		private static void AoC7(string path)
 		{
-			int orbits = 0;
-			using (StreamReader file = new StreamReader(path))
+			var amps = GetPermutations<int>(Enumerable.Range(5, 5), 5).ToList();
+			List<int> thrusts = new List<int>();
+
+			foreach (var amp in amps)
 			{
-				string line = "";
-
-				List<Orb> orbitals = new List<Orb>();
-				orbitals.Add(new Orb("COM"));
-				while (!file.EndOfStream)
+				List<int> positions = IntCodeInput(path);
+				int signal = 0;
+				foreach (var input in amp)
 				{
-					line = file.ReadLine();
-
-					var orbs = line.Split(')');
-
-					orbitals.Add(new Orb(orbs[1],orbs[0]));
+					List<string> inputs = new List<string>();
+					inputs.Add(input.ToString());
+					inputs.Add(signal.ToString());
+					signal = IntCodeComputer(positions, inputs);
 				}
 
-				Console.ReadKey();
+				thrusts.Add(signal);
 			}
+
+			Console.WriteLine(thrusts.Max());
+
+			//List<int> positions = IntCodeInput(path);
+			//IntCodeComputer(positions);
+			Console.ReadKey();
 		}
 
-		internal class Orb
+		//Got from Stackoverflow
+		private static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
 		{
-			public string name;
-			public string primary;
+			if (length == 1) return list.Select(t => new T[] { t });
 
-			public Orb(string name, string primary = null)
+			return GetPermutations(list, length - 1)
+				.SelectMany(t => list.Where(e => !t.Contains(e)),
+					(t1, t2) => t1.Concat(new T[] { t2 }));
+		}
+
+		private static void GetOrbits(Orb orb, List<Orb> orbitals, ref int count, string target = null)
+		{
+			if (target == null)     //Part 1
 			{
-				this.name = name;
-				this.primary = primary;
+				if (orb.primary != null)
+				{
+					count++;
+					Orb next = orbitals.Single(x => x.name == orb.primary);
+					GetOrbits(next, orbitals, ref count);
+				}
+			}
+			else    //Part 2
+			{
+				if (orb.name != target)
+				{
+					count++;
+					Orb next = orbitals.Single(x => x.name == orb.primary);
+					GetOrbits(next, orbitals, ref count, target);
+				}
 			}
 		}
 
-		private static int Orbits(Orb orb)
+		private static void GetPrimaries(Orb orb, List<Orb> orbitals, ref List<Orb> primaries)
 		{
-
+			if (orb.primary != null)
+			{
+				Orb next = orbitals.Single(x => x.name == orb.primary);
+				primaries.Add(next);
+				GetPrimaries(next, orbitals, ref primaries);
+			}
 		}
 
-		private static int IntCodeComputer(List<int> positions)
+		private static int IntCodeComputer(List<int> positions, List<string> input = null)
 		{
 			int index = 0;
 			int noun;
@@ -120,8 +151,18 @@ namespace AdventOfCode
 						break;
 					case 3:
 						address = positions[index + 1];
-						var input = Console.ReadLine();
-						positions[address] = Int32.Parse(input);
+						if (input == null)
+						{
+							var read = output.ToString();	//Console.ReadLine();
+							positions[address] = Int32.Parse(read);
+						}
+						else
+						{
+							positions[address] = Int32.Parse(input.First());
+							input.RemoveAt(0);
+							if (input.Count == 0)
+								input = null;
+						}
 						index += 2;
 						break;
 					case 4:
@@ -254,7 +295,7 @@ namespace AdventOfCode
 			}
 			while (positions[index] != 99);
 
-			return positions[0];
+			return output;//positions[0];
 		}
 
 		private static List<int> IntCodeInput(string path)
@@ -337,6 +378,64 @@ namespace AdventOfCode
 			else
 				return fuel;
 		}
+
+		private static void AoC6(string path)
+		{
+			int orbits = 0;
+			using (StreamReader file = new StreamReader(path))
+			{
+				string line = "";
+
+				List<Orb> orbitals = new List<Orb>();
+				orbitals.Add(new Orb("COM"));
+				while (!file.EndOfStream)
+				{
+					line = file.ReadLine();
+
+					var orbs = line.Split(')');
+
+					orbitals.Add(new Orb(orbs[1], orbs[0]));
+				}
+
+				//foreach(var orb in orbitals) //Part 1
+				//{
+				//	GetOrbits(orb, orbitals, ref orbits);
+				//}
+
+				Orb you = orbitals.Single(x => x.name == "YOU");
+				Orb santa = orbitals.Single(x => x.name == "SAN");
+				List<Orb> yPrimaries = new List<Orb>();
+				List<Orb> sPrimaries = new List<Orb>();
+				int yOrbits = 0;
+				int sOrbits = 0;
+
+				GetPrimaries(you, orbitals, ref yPrimaries);
+				GetPrimaries(santa, orbitals, ref sPrimaries);
+
+				var intersects = yPrimaries.Intersect(sPrimaries);
+
+				Orb commonPrimary = intersects.First();
+
+				GetOrbits(you, orbitals, ref yOrbits, commonPrimary.name);
+				GetOrbits(santa, orbitals, ref sOrbits, commonPrimary.name);
+
+				Console.WriteLine(yOrbits + sOrbits - 2);
+				Console.ReadKey();
+			}
+		}
+
+		internal class Orb
+		{
+			public string name;
+			public string primary;
+
+			public Orb(string name, string primary = null)
+			{
+				this.name = name;
+				this.primary = primary;
+			}
+		}
+
 
 		private static void AoC5(string path)
 		{
