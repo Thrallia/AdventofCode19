@@ -19,7 +19,78 @@ namespace AdventOfCode
 			//AoC4(235741, 706948);
 			//AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
 			//AoC6(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC6.txt");
-			AoC7(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC7.txt");
+			//AoC7(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC7.txt");
+			AoC8(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC8.txt");
+		}
+
+		private static void AoC8(string path)
+		{
+			const int width = 25;
+			const int height = 6;
+			//List<int> layer = new List<int>();
+			List<List<int>> image = new List<List<int>>();
+
+			var line = "";// "0222112222120000"; //test
+			using (StreamReader file = new StreamReader(path))
+			{
+
+				while (!file.EndOfStream)
+				{
+					line = file.ReadLine();
+				}
+			}
+			var buffer = line.ToCharArray().ToList();
+			while (buffer.Count > 0)
+			{
+				List<int> layer = new List<int>();
+				for (int i = 0; i < (width * height); i++)
+				{
+					var dig = buffer[0].ToString();
+					layer.Add(Int32.Parse(dig));
+					buffer.RemoveAt(0);
+				}
+				image.Add(layer);
+			}
+
+			List<int> pixels = new List<int>();
+			for (int i = 0; i < (width * height); i++)
+			{
+				foreach (var layer in image)
+				{
+					if (layer[i] == 2)
+					{
+						continue;
+					}
+					else
+					{
+						pixels.Add(layer[i]);
+						break;
+					}
+				}
+			}
+
+			string output = "";
+			int j = 0;
+			while (j < (height * width))
+			{
+				for (int k = 0; k < width; k++)
+				{
+					Console.Write(pixels[k + j]);
+					output += pixels[k + j];
+				}
+				j += width;
+				Console.Write("\n");
+			}
+
+			//part 1
+			//var minZ = image.Select(x => x.Count(y => y == 0)).ToList();
+
+			//int layerZ = minZ.IndexOf(minZ.Min());
+
+			//var ones = image[layerZ].Count(x=> x==1);
+			//var twos = image[layerZ].Count(x => x == 2);
+			//Console.WriteLine(ones * twos);
+			Console.ReadKey();
 		}
 
 		private static void AoC7(string path)
@@ -153,7 +224,7 @@ namespace AdventOfCode
 						address = positions[index + 1];
 						if (input == null)
 						{
-							var read = output.ToString();	//Console.ReadLine();
+							var read = output.ToString();   //Console.ReadLine();
 							positions[address] = Int32.Parse(read);
 						}
 						else
@@ -397,10 +468,10 @@ namespace AdventOfCode
 					orbitals.Add(new Orb(orbs[1], orbs[0]));
 				}
 
-				//foreach(var orb in orbitals) //Part 1
-				//{
-				//	GetOrbits(orb, orbitals, ref orbits);
-				//}
+				foreach (var orb in orbitals) //Part 1
+				{
+					GetOrbits(orb, orbitals, ref orbits);
+				}
 
 				Orb you = orbitals.Single(x => x.name == "YOU");
 				Orb santa = orbitals.Single(x => x.name == "SAN");
