@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace AdventOfCode
 {
@@ -15,12 +16,124 @@ namespace AdventOfCode
 		{
 			//Aoc1(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC1.txt");
 			//AoC2(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC2.txt");
-			//AoC3(@"C:\develop\AdventofCode\inputs\AoC3.txt");
+			//AoC3(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC3.txt");
 			//AoC4(235741, 706948);
 			//AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
 			//AoC6(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC6.txt");
 			//AoC7(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC7.txt");
-			AoC8(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC8.txt");
+			//AoC8(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC8.txt");
+			AoC12(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC12.txt");
+		}
+
+		private static void AoC12(string path)
+		{
+			const int steps = 1000;
+
+			int count = 1;
+			int xConsonance = 0;
+			int yConsonance = 0;
+			int zConsonance = 0;
+
+			Moon Io;
+			Moon Europa;
+			Moon Ganymede;
+			Moon Callisto;
+
+			Queue<Point3D> points = new Queue<Point3D>();
+			using (StreamReader file = new StreamReader(path))
+			{
+				string line = string.Empty;
+
+				while (!file.EndOfStream)
+				{
+					line = file.ReadLine();
+					var split = line.Split('=', ',', '<', '>');
+					points.Enqueue(new Point3D(Double.Parse(split[2]), Double.Parse(split[4]), Double.Parse(split[6])));
+				}
+			}
+
+			//init moons
+			Io = new Moon(points.Dequeue());
+			Europa = new Moon(points.Dequeue());
+			Ganymede = new Moon(points.Dequeue());
+			Callisto = new Moon(points.Dequeue());
+
+			//part 2
+			while (xConsonance == 0 || yConsonance == 0 || zConsonance == 0)
+			{
+				//apply gravity
+				Io.CalcVelocities(Europa);
+				Io.CalcVelocities(Ganymede);
+				Io.CalcVelocities(Callisto);
+				Europa.CalcVelocities(Io);
+				Europa.CalcVelocities(Ganymede);
+				Europa.CalcVelocities(Callisto);
+				Ganymede.CalcVelocities(Europa);
+				Ganymede.CalcVelocities(Io);
+				Ganymede.CalcVelocities(Callisto);
+				Callisto.CalcVelocities(Europa);
+				Callisto.CalcVelocities(Ganymede);
+				Callisto.CalcVelocities(Io);
+
+				//time step
+				Io.TimeStep();
+				Europa.TimeStep();
+				Ganymede.TimeStep();
+				Callisto.TimeStep();
+
+				if (xConsonance == 0)
+					if (Io.GetVelocityByAxis("X") == 0 && Europa.GetVelocityByAxis("X") == 0 &&
+						Ganymede.GetVelocityByAxis("X") == 0 && Callisto.GetVelocityByAxis("X") == 0)
+						xConsonance = count;
+				if (yConsonance == 0)
+					if (Io.GetVelocityByAxis("Y") == 0 && Europa.GetVelocityByAxis("Y") == 0 &&
+						Ganymede.GetVelocityByAxis("Y") == 0 && Callisto.GetVelocityByAxis("Y") == 0)
+						yConsonance = count;
+				if (zConsonance == 0)
+					if (Io.GetVelocityByAxis("Z") == 0 && Europa.GetVelocityByAxis("Z") == 0 &&
+						Ganymede.GetVelocityByAxis("Z") == 0 && Callisto.GetVelocityByAxis("Z") == 0)
+						zConsonance = count;
+
+				count++;
+			}
+
+			long lcm = Functions.LCM(xConsonance, Functions.LCM(yConsonance, zConsonance)) * 2;
+
+			Console.WriteLine(lcm);
+
+			//part 1
+			for (int i = 0; i < steps; i++)
+			{
+				//apply gravity
+				Io.CalcVelocities(Europa);
+				Io.CalcVelocities(Ganymede);
+				Io.CalcVelocities(Callisto);
+				Europa.CalcVelocities(Io);
+				Europa.CalcVelocities(Ganymede);
+				Europa.CalcVelocities(Callisto);
+				Ganymede.CalcVelocities(Europa);
+				Ganymede.CalcVelocities(Io);
+				Ganymede.CalcVelocities(Callisto);
+				Callisto.CalcVelocities(Europa);
+				Callisto.CalcVelocities(Ganymede);
+				Callisto.CalcVelocities(Io);
+
+				//time step
+				Io.TimeStep();
+				Europa.TimeStep();
+				Ganymede.TimeStep();
+				Callisto.TimeStep();
+			}
+
+			var IoTotal = Io.CalcPotentialEnergy() * Io.CalcKineticEnergy();
+			var EurTotal = Europa.CalcPotentialEnergy() * Europa.CalcKineticEnergy();
+			var GanyTotal = Ganymede.CalcPotentialEnergy() * Ganymede.CalcKineticEnergy();
+			var CallTotal = Callisto.CalcPotentialEnergy() * Callisto.CalcKineticEnergy();
+
+			var TotalEnergy = IoTotal + EurTotal + GanyTotal + CallTotal;
+
+			Console.WriteLine(TotalEnergy);
+			Console.ReadKey();
 		}
 
 		private static void AoC8(string path)
@@ -95,7 +208,7 @@ namespace AdventOfCode
 
 		private static void AoC7(string path)
 		{
-			var amps = GetPermutations<int>(Enumerable.Range(5, 5), 5).ToList();
+			var amps = Functions.GetPermutations<int>(Enumerable.Range(5, 5), 5).ToList();
 			List<int> thrusts = new List<int>();
 
 			foreach (var amp in amps)
@@ -120,47 +233,7 @@ namespace AdventOfCode
 			Console.ReadKey();
 		}
 
-		//Got from Stackoverflow
-		private static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
-		{
-			if (length == 1) return list.Select(t => new T[] { t });
 
-			return GetPermutations(list, length - 1)
-				.SelectMany(t => list.Where(e => !t.Contains(e)),
-					(t1, t2) => t1.Concat(new T[] { t2 }));
-		}
-
-		private static void GetOrbits(Orb orb, List<Orb> orbitals, ref int count, string target = null)
-		{
-			if (target == null)     //Part 1
-			{
-				if (orb.primary != null)
-				{
-					count++;
-					Orb next = orbitals.Single(x => x.name == orb.primary);
-					GetOrbits(next, orbitals, ref count);
-				}
-			}
-			else    //Part 2
-			{
-				if (orb.name != target)
-				{
-					count++;
-					Orb next = orbitals.Single(x => x.name == orb.primary);
-					GetOrbits(next, orbitals, ref count, target);
-				}
-			}
-		}
-
-		private static void GetPrimaries(Orb orb, List<Orb> orbitals, ref List<Orb> primaries)
-		{
-			if (orb.primary != null)
-			{
-				Orb next = orbitals.Single(x => x.name == orb.primary);
-				primaries.Add(next);
-				GetPrimaries(next, orbitals, ref primaries);
-			}
-		}
 
 		private static int IntCodeComputer(List<int> positions, List<string> input = null)
 		{
@@ -386,70 +459,6 @@ namespace AdventOfCode
 			return positions;
 		}
 
-		private static bool calcPassGroups(char[] digits)
-		{
-			var counts = digits.GroupBy(x => x).Select(x => x.Count());
-			if (counts.Contains(2)) //if(counts.Max > 1) //Part 1
-				return true;
-			else
-				return false;
-		}
-
-		private static bool calcPassAsc(char[] digits)
-		{
-			for (int i = 1; i < digits.Length; i++)
-			{
-				if (digits[i] - digits[i - 1] < 0)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private static List<Point> CalcPath(List<string> moves)
-		{
-			List<Point> wire = new List<Point>();
-			wire.Add(new Point(0, 0));
-			foreach (var move in moves)
-			{
-				var curPoint = wire[wire.Count() - 1];
-				var dir = move.Substring(0, 1);
-				int distance = Int32.Parse(move.Substring(1));
-				switch (dir)
-				{
-					case "R":
-						for (int i = 1; i <= distance; i++)
-							wire.Add(new Point(curPoint.X + i, curPoint.Y));
-						break;
-					case "D":
-						for (int i = 1; i <= distance; i++)
-							wire.Add(new Point(curPoint.X, curPoint.Y - i));
-						break;
-					case "L":
-						for (int i = 1; i <= distance; i++)
-							wire.Add(new Point(curPoint.X - i, curPoint.Y));
-						break;
-					case "U":
-						for (int i = 1; i <= distance; i++)
-							wire.Add(new Point(curPoint.X, curPoint.Y + i));
-						break;
-					default: break;
-				}
-			}
-
-			return wire;
-		}
-
-		static int calcFuel(double mass)
-		{
-			int fuel = (int)Math.Floor(mass / 3) - 2;
-			if (fuel < 0)
-				return 0;
-			else
-				return fuel;
-		}
-
 		private static void AoC6(string path)
 		{
 			int orbits = 0;
@@ -470,7 +479,7 @@ namespace AdventOfCode
 
 				foreach (var orb in orbitals) //Part 1
 				{
-					GetOrbits(orb, orbitals, ref orbits);
+					Functions.GetOrbits(orb, orbitals, ref orbits);
 				}
 
 				Orb you = orbitals.Single(x => x.name == "YOU");
@@ -480,33 +489,20 @@ namespace AdventOfCode
 				int yOrbits = 0;
 				int sOrbits = 0;
 
-				GetPrimaries(you, orbitals, ref yPrimaries);
-				GetPrimaries(santa, orbitals, ref sPrimaries);
+				Functions.GetPrimaries(you, orbitals, ref yPrimaries);
+				Functions.GetPrimaries(santa, orbitals, ref sPrimaries);
 
 				var intersects = yPrimaries.Intersect(sPrimaries);
 
 				Orb commonPrimary = intersects.First();
 
-				GetOrbits(you, orbitals, ref yOrbits, commonPrimary.name);
-				GetOrbits(santa, orbitals, ref sOrbits, commonPrimary.name);
+				Functions.GetOrbits(you, orbitals, ref yOrbits, commonPrimary.name);
+				Functions.GetOrbits(santa, orbitals, ref sOrbits, commonPrimary.name);
 
 				Console.WriteLine(yOrbits + sOrbits - 2);
 				Console.ReadKey();
 			}
 		}
-
-		internal class Orb
-		{
-			public string name;
-			public string primary;
-
-			public Orb(string name, string primary = null)
-			{
-				this.name = name;
-				this.primary = primary;
-			}
-		}
-
 
 		private static void AoC5(string path)
 		{
@@ -525,10 +521,10 @@ namespace AdventOfCode
 
 				var digits = comp.ToCharArray();
 
-				bool dub = calcPassGroups(digits);
+				bool dub = Functions.calcPassGroups(digits);
 				if (dub)
 				{
-					bool desc = calcPassAsc(digits);
+					bool desc = Functions.calcPassAsc(digits);
 					if (!desc)
 						count++;
 				}
@@ -557,8 +553,8 @@ namespace AdventOfCode
 			moves1 = wires[0].Split(',').ToList();
 			moves2 = wires[1].Split(',').ToList();
 
-			wire1 = CalcPath(moves1);
-			wire2 = CalcPath(moves2);
+			wire1 = Functions.CalcPath(moves1);
+			wire2 = Functions.CalcPath(moves2);
 
 			var crosses = wire1.Intersect(wire2).ToList();
 
@@ -607,12 +603,12 @@ namespace AdventOfCode
 				{
 					line = file.ReadLine();
 					double mass = double.Parse(line);
-					int fuel = calcFuel(mass);
+					int fuel = Functions.calcFuel(mass);
 					total += fuel;
 					Console.WriteLine(fuel);
-					while (fuel > 0)
+					while (fuel > 0)    //part 2
 					{
-						var extra = calcFuel((double)fuel);
+						var extra = Functions.calcFuel((double)fuel);
 						total += extra;
 						fuel = extra;
 					}
