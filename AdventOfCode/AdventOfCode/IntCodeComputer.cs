@@ -10,265 +10,334 @@ using System.Threading.Tasks;
 namespace AdventOfCode
 {
 	//https://github.com/chuckries/AdventOfCode/blob/master/AdventOfCode.2019/IntCode.cs
+
+	public class Punchcard
+	{
+		private List<long> punchCards;
+		public Punchcard(List<long> code)
+		{
+			punchCards = code;
+		}
+
+		public long GetAddress(long address)
+		{
+			FillToAddress(address);
+			return punchCards[(int)address];
+		}
+
+		public void SetAddress(Parameter target, long value)
+		{
+			long address = target.GetLiteral(this);
+			FillToAddress(address);
+
+			punchCards[(int)address] = value;
+		}
+
+		private void FillToAddress(long address)
+		{
+			if (punchCards.Count < address + 1)
+				while (punchCards.Count < address + 1)
+					punchCards.Add(0);
+		}
+	}
 	class IntCodeComputer
 	{
-		List<int> punchCards;
-		private int pointer;
-		private int noun;
-		private int verb;
-		private int opcode;
-		private int address;
-		public bool IsHalt;
-		
+		public long LastOut;
+		public Punchcard PC;
+		public long Pointer;
+		public int RelativeBase;
 
-		enum OpCode
+		public IntCodeComputer(List<long> instructions)
 		{
-			Add=1,
-			Multiply=2,
-			Input=3,
-			Output=4,
-			JumpTrue=5,
-			JumpFalse=6,
-			LessThan=7,
-			EqualTo=8,
-			Halt=99
+			Pointer = 0;
+			PC = new Punchcard(instructions);
 		}
 
-		enum Mode
+		private List<Parameter> GetParameters(Operator op, string opCode)
 		{
-			Position=0,
-			Immediate=1
-		}
+			List<Parameter> param = new List<Parameter>();
+			string modes = string.Empty;
+			if (PC.GetAddress(Pointer).ToString().Length > 2)
+				modes = opCode.Substring(0, opCode.Length - 2);
 
-		public IntCodeComputer(string path)
-		{
-			string line = string.Empty;
-			using (StreamReader file = new StreamReader(path))
+			for (int i = 0; i < op.ParamCount; i++)
+				param.Add(new Parameter(PC.GetAddress(Pointer + i + 1), RelativeBase));
+
+			if (modes != string.Empty)
 			{
-				line = file.ReadToEnd();
-			}
-			var pos = line.Split(',');
-			foreach (string p in pos)
-			{
-				punchCards.Add(Int32.Parse(p));
-				//Console.WriteLine(p);
-			}
-
-			pointer = 0;
-			noun = 0;
-			verb = 0;
-			opcode = 0;
-			address = 0;
-			IsHalt = false;
-		}
-
-		public int Run(string input = null)
-		{
-			int output = 0;
-
-			do
-			{
-				opcode = punchCards[pointer];
-				noun = punchCards[pointer + 1];
-				verb = punchCards[pointer + 2];
-
-				switch (opcode)
+				modes = modes.PadLeft(3, '0');
+				Stack<int> stack = new Stack<int>();
+				for (int x = 0; x < 3; x++)
 				{
-					case 1001:
-						address = punchCards[pointer + 3];
-						Add(punchCards[noun], verb, punchCards[address]);
-						pointer += 4;
-						break;
-					case 1101:
-						address = punchCards[pointer + 3];
-						Add(noun, verb, punchCards[address]);
-						pointer += 4;
-						break;
-					case 1002:
-						address = punchCards[pointer + 3];
-						Multiply(punchCards[noun], verb, punchCards[address]);
-						pointer += 4;
-						break;
-					case 1102:
-						address = punchCards[pointer + 3];
-						Multiply(noun, verb, punchCards[address]);
-						pointer += 4;
-						break;
-					case 101:
-						address = punchCards[pointer + 3];
-						Add(noun, punchCards[verb], punchCards[address]);
-						pointer += 4;
-						break;
-					case 102:
-						address = punchCards[pointer + 3];
-						Multiply(noun, punchCards[verb], punchCards[address]);
-						pointer += 4;
-						break;
-					case 1:
-						address = punchCards[pointer + 3];
-						Add(punchCards[noun], punchCards[verb], punchCards[address]);
-						pointer += 4;
-						break;
-					case 2:
-						address = punchCards[pointer + 3];
-						Multiply(punchCards[noun], punchCards[verb], punchCards[address]);
-						pointer += 4;
-						break;
-					case 3:
-						address = punchCards[pointer + 1];
-						if (input == null)
-						{
-							var read = output.ToString();   //Console.ReadLine();
-							Input(Int32.Parse(read), punchCards[address]);
-						}
-						else
-						{
-							Input(Int32.Parse(input), punchCards[address]);
-							input = "";
-						}
-						pointer += 2;
-						break;
-					case 4:
-						address = punchCards[pointer + 1];
-						output = Output(punchCards[address]);
-						Console.WriteLine(output);
-						pointer += 2;
-						break;
-					case 104:
-						address = punchCards[pointer + 1];
-						output = Output(address);
-						Console.WriteLine(output);
-						pointer += 2;
-						break;
-					case 5:
-						JumpTrue(punchCards[noun],punchCards[verb]);
-						break;
-					case 105:
-						JumpTrue(noun ,punchCards[verb]);
-						break;
-					case 1005:
-						JumpTrue(punchCards[noun],verb);
-						break;
-					case 1105:
-						JumpTrue(noun,verb);
-						break;
-					case 6:
-						JumpFalse(punchCards[noun],punchCards[verb]);
-						break;
-					case 106:
-						JumpFalse(noun, punchCards[verb]);
-						break;
-					case 1006:
-						JumpFalse(punchCards[noun], verb);
-						break;
-					case 1106:
-						JumpFalse(noun, verb);
-						break;
-					case 7:
-						address = punchCards[pointer + 3];
-						LessThan(punchCards[noun], punchCards[verb], address);
-						pointer += 4;
-						break;
-					case 107:
-						address = punchCards[pointer + 3];
-						LessThan(noun, punchCards[verb], address);
-						pointer += 4;
-						break;
-					case 1007:
-						address = punchCards[pointer + 3];
-						LessThan(punchCards[noun], verb, address);
-						pointer += 4;
-						break;
-					case 1107:
-						address = punchCards[pointer + 3];
-						LessThan(noun, verb, address);
-						pointer += 4;
-						break;
-					case 8:
-						address = punchCards[pointer + 3];
-						EqualTo(punchCards[noun], punchCards[verb], address);
-						pointer += 4;
-						break;
-					case 108:
-						address = punchCards[pointer + 3];
-						EqualTo(noun, punchCards[verb], address);
-						pointer += 4;
-						break;
-					case 1008:
-						address = punchCards[pointer + 3];
-						EqualTo(punchCards[noun], verb, address);
-						pointer += 4;
-						break;
-					case 1108:
-						address = punchCards[pointer + 3];
-						EqualTo(noun, verb, address);
-						pointer += 4;
-						break;
-					case 99: break;
-					default: break;
+					int mode;
+					if (x < modes.Length)
+						mode = modes[x];
+					else
+						mode = '0';
+					//if (op.OpCode == OpCode.EqualTo)
+					//	mode = '0';
+					stack.Push(mode - '0');
 				}
+
+				foreach (var par in param)
+					par.SetMode(stack.Pop());
 			}
-			while (punchCards[pointer] != 99);
 
-			return output;//punchCards[0];
+			return param;
 		}
 
-		public void Add(int x, int y, int location)
+		private Operator GetOperator(string opCode)
 		{
-			punchCards[location] = x + y;
+			if (opCode.Length > 2)
+				return Operators.Ops[int.Parse(opCode.Substring(opCode.Length - 2))];
+
+			return Operators.Ops[int.Parse(opCode)];
 		}
 
-		public void Multiply(int x, int y, int location)
+		public OpCode Run(bool loop)
 		{
-			punchCards[location] = x * y;
-		}
+			string opcode = PC.GetAddress(Pointer).ToString();
+			Operator op = GetOperator(opcode);
+			List<Parameter> parameters = GetParameters(op, opcode);
+			int nextOp = op.ParamCount + 1;
+			Pointer += nextOp;
 
-		public void Input(int x, int location)
-		{
-			punchCards[location] = x;
-		}
+			switch (op.OpCode)
+			{
+				case OpCode.Add:
+					Add(parameters);
+					break;
+				case OpCode.Multiply:
+					Multiply(parameters);
+					break;
+				case OpCode.Input:
+					Input(parameters[0]);
+					break;
+				case OpCode.Output:
+					Output(parameters[0]);
+					break;
+				case OpCode.JumpTrue:
+					JumpTrue(parameters);
+					break;
+				case OpCode.JumpFalse:
+					JumpFalse(parameters);
+					break;
+				case OpCode.LessThan:
+					LessThan(parameters);
+					break;
+				case OpCode.EqualTo:
+					EqualTo(parameters);
+					break;
+				case OpCode.SetBase:
+					SetBase(parameters[0]);
+					break;
+				case OpCode.Halt:
+					//loop = false;
+					return op.OpCode;
+				default: break;
+			}
 
-		public int Output(int location)
-		{
-			return punchCards[location];
-		}
-
-		public void JumpTrue(int x, int location)
-		{
-			if (x != 0)
-				pointer = location;
+			if (loop)
+				return Run(loop);
 			else
-				pointer += 3;
+				return op.OpCode;
 		}
 
-		public void JumpFalse(int x, int location)
+		public void Add(List<Parameter> param)
 		{
+			PC.SetAddress(param[2], param[0].GetResult(PC) + param[1].GetResult(PC));
+		}
+
+		public void Multiply(List<Parameter> param)
+		{
+			PC.SetAddress(param[2], param[0].GetResult(PC) * param[1].GetResult(PC));
+		}
+
+		public virtual void Input(Parameter param)
+		{
+			Console.WriteLine("Input");
+			string line = Console.ReadLine();
+			int val = int.Parse(line);
+			Console.WriteLine("YOU ENTERED " + val);
+			PC.SetAddress(param, val);
+		}
+
+		public virtual void Output(Parameter param)
+		{
+			Console.WriteLine(param.GetResult(PC));
+			LastOut = param.GetResult(PC);
+		}
+
+		public void JumpTrue(List<Parameter> param)
+		{
+			if (param[0].GetResult(PC) != 0)
+				Pointer = param[1].GetResult(PC);
+		}
+
+		public void JumpFalse(List<Parameter> param)
+		{
+			var x = param[0].GetResult(PC);
 			if (x == 0)
-				pointer = location;
-			else
-				pointer += 3;
+				Pointer = param[1].GetResult(PC);
 		}
 
-		public void LessThan(int x, int y, int location)
+		public void LessThan(List<Parameter> param)
 		{
-			if (x < y)
-				punchCards[location] = 1;
+			if (param[0].GetResult(PC) < param[1].GetResult(PC))
+				PC.SetAddress(param[2], 1);
 			else
-				punchCards[location] = 0;
+				PC.SetAddress(param[2], 0);
 		}
 
-		public void EqualTo(int x, int y, int location)
+		public void EqualTo(List<Parameter> param)
 		{
-			if (x == y)
-				punchCards[location] = 1;
+			if (param[0].GetResult(PC) == param[1].GetResult(PC))
+				PC.SetAddress(param[2], 1);
 			else
-				punchCards[location] = 0;
+				PC.SetAddress(param[2], 0);
 		}
 
-		public void PrintCard()
+		public void SetBase(Parameter param)
 		{
-			foreach (var line in punchCards)
-				Console.WriteLine(line);
+			RelativeBase += (int)param.GetResult(PC);
 		}
+	}
+
+	class IntCodeComputerQueueInput : IntCodeComputer
+	{
+		public Queue<int> Inputs;
+
+		public IntCodeComputerQueueInput(List<long> instructions) : base(instructions)
+		{ }
+
+		public override void Input(Parameter param)
+		{
+			int input = Inputs.Dequeue();
+			PC.SetAddress(param, input);
+		}
+
+		public void Process(Queue<int> inputs)
+		{
+			Inputs = inputs;
+			Run(true);
+		}
+	}
+
+	class IntCodeComputerLooper : IntCodeComputerQueueInput
+	{
+		public bool Pause = false;
+		public IntCodeComputerLooper(List<long> instructions) : base(instructions)
+		{ }
+
+		public override void Output(Parameter param)
+		{
+			LastOut = param.GetResult(PC);
+			Pause = true;
+		}
+	}
+
+	enum OpCode
+	{
+		Add,
+		Multiply,
+		Input,
+		Output,
+		JumpTrue,
+		JumpFalse,
+		LessThan,
+		EqualTo,
+		SetBase,
+		Halt
+	}
+
+	public enum Mode
+	{
+		Position = 0,
+		Immediate = 1,
+		Relative = 2
+	}
+
+	class Operator
+	{
+		public int ParamCount;
+		public OpCode OpCode;
+
+		public Operator(OpCode op, int paramcount)
+		{
+			ParamCount = paramcount;
+			OpCode = op;
+		}
+	}
+
+	public class Parameter
+	{
+		private Mode Mode;
+		public long Value;
+		public int RelativeBase;
+
+		public Parameter(Mode mode, long value, int relativeBase)
+		{
+			Mode = mode;
+			Value = value;
+			RelativeBase = relativeBase;
+		}
+
+		public Parameter(Mode mode, long value)
+		{
+			Mode = mode;
+			Value = value;
+		}
+
+		public Parameter(long value, int relativeBase)
+		{
+			Mode = Mode.Position;
+			Value = value;
+			RelativeBase = relativeBase;
+		}
+
+		public long GetResult(Punchcard pc)
+		{
+			switch (Mode)
+			{
+				case Mode.Position:
+					return pc.GetAddress(Value);
+				case Mode.Immediate:
+					return Value;
+				case Mode.Relative:
+					int newAdd = RelativeBase + (int)Value;
+					return pc.GetAddress(newAdd);
+				default: return -999;
+			}
+		}
+
+		public long GetLiteral(Punchcard pc)
+		{
+			if (Mode == Mode.Position || Mode == Mode.Immediate)
+				return Value;
+			else
+				return RelativeBase + Value;
+		}
+
+		public void SetMode(int mode)
+		{
+			Mode = (Mode)mode;
+		}
+	}
+
+	class Operators
+	{
+		public static readonly Dictionary<int, Operator> Ops = new Dictionary<int, Operator>
+		{
+			{1, new Operator(OpCode.Add, 3)},
+			{2, new Operator(OpCode.Multiply, 3)},
+			{3, new Operator(OpCode.Input, 1)},
+			{4, new Operator(OpCode.Output, 1)},
+			{5, new Operator(OpCode.JumpTrue, 2)},
+			{6, new Operator(OpCode.JumpFalse, 2)},
+			{7, new Operator(OpCode.LessThan, 3)},
+			{8, new Operator(OpCode.EqualTo, 3)},
+			{9, new Operator(OpCode.SetBase, 1)},
+			{99, new Operator(OpCode.Halt, 0)}
+		};
 	}
 }
