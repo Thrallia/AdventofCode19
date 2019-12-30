@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Drawing;
 using System.Windows;
@@ -20,9 +21,22 @@ namespace AdventOfCode
 			//AoC4(235741, 706948);
 			//AoC5(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC5.txt");
 			//AoC6(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC6.txt");
-			//AoC7(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC7.txt");
+			//AoC7(@"C:\develop\AdventofCode\inputs\AoC7.txt");
 			//AoC8(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC8.txt");
-			AoC12(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC12.txt");
+			AoC9(@"C:\develop\AdventofCode\inputs\AoC9test2.txt");
+			//AoC12(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC12.txt");
+		}
+
+		private static void AoC9(string path)
+		{
+			List<long> positions = Functions.IntCodeProgram(path);
+			IntCodeComputer PC = new IntCodeComputer(positions);
+
+			PC.Run(true);
+			var output = PC.LastOut;
+
+			Console.WriteLine(output);
+			Console.ReadKey();
 		}
 
 		private static void AoC12(string path)
@@ -208,19 +222,43 @@ namespace AdventOfCode
 
 		private static void AoC7(string path)
 		{
+			//Console.WriteLine(AoC7Part1(path));
+
 			var amps = Functions.GetPermutations<int>(Enumerable.Range(5, 5), 5).ToList();
-			List<int> thrusts = new List<int>();
+			List<long> thrusts = new List<long>();
+
+			List<Amplifier> amplifiers;
 
 			foreach (var amp in amps)
 			{
-				List<int> positions = IntCodeInput(path);
-				int signal = 0;
+				amplifiers=new List<Amplifier>();
+
+				List<long> positions = Functions.IntCodeProgram(path);
 				foreach (var input in amp)
 				{
-					List<string> inputs = new List<string>();
-					inputs.Add(input.ToString());
-					inputs.Add(signal.ToString());
-					signal = IntCodeComputer(positions, inputs);
+					Queue<int> inputs = new Queue<int>();
+					inputs.Enqueue(input);
+					amplifiers.Add(new Amplifier(inputs, positions));
+				}
+
+				long signal = 0;
+
+				while (amplifiers.Last().Completed == false)
+				{
+					foreach (var amplifier in amplifiers)
+					{
+						amplifier.Continue((int)signal);
+
+						while (!amplifier.Completed && !amplifier.PC.Pause)
+						{
+							OpCode lastOp = amplifier.PC.Run(false);
+
+							if (lastOp == OpCode.Halt)
+								amplifier.Completed = true;
+						}
+
+						signal = amplifier.PC.LastOut;
+					}
 				}
 
 				thrusts.Add(signal);
@@ -228,12 +266,33 @@ namespace AdventOfCode
 
 			Console.WriteLine(thrusts.Max());
 
-			//List<int> positions = IntCodeInput(path);
-			//IntCodeComputer(positions);
 			Console.ReadKey();
 		}
 
+		private static long AoC7Part1(string path)
+		{
+			var amps = Functions.GetPermutations<int>(Enumerable.Range(0, 5), 5).ToList();
+			List<long> thrusts = new List<long>();
 
+			foreach (var amp in amps)
+			{
+				List<long> positions = Functions.IntCodeProgram(path);
+				long signal = 0;
+				foreach (var input in amp)
+				{
+					IntCodeComputerQueueInput comp = new IntCodeComputerQueueInput(positions);
+					Queue<int> inputs = new Queue<int>();
+					inputs.Enqueue(input);
+					inputs.Enqueue((int)signal);
+					comp.Process(inputs);
+					signal = comp.LastOut;
+				}
+
+				thrusts.Add(signal);
+			}
+
+			return thrusts.Max();
+		}
 
 		private static int IntCodeComputer(List<int> positions, List<string> input = null)
 		{
@@ -442,22 +501,7 @@ namespace AdventOfCode
 			return output;//positions[0];
 		}
 
-		private static List<int> IntCodeInput(string path)
-		{
-
-			List<int> positions = new List<int>();
-			using (StreamReader file = new StreamReader(path))
-			{
-				string line = file.ReadToEnd();
-				var pos = line.Split(',');
-				foreach (string p in pos)
-				{
-					positions.Add(Int32.Parse(p));
-					//Console.WriteLine(p);
-				}
-			}
-			return positions;
-		}
+		
 
 		private static void AoC6(string path)
 		{
@@ -506,7 +550,7 @@ namespace AdventOfCode
 
 		private static void AoC5(string path)
 		{
-			List<int> positions = IntCodeInput(path);
+			List<long> positions = Functions.IntCodeProgram(path);
 			IntCodeComputer(positions);
 
 			Console.ReadKey();
@@ -580,11 +624,11 @@ namespace AdventOfCode
 
 		private static void AoC2(string path)
 		{
-			List<int> positions = IntCodeInput(path);
+			List<long> positions = Functions.IntCodeProgram(path);
 
 			int output = IntCodeComputer(positions);
 
-			int grav = 100 * positions[1] + positions[2];
+			long grav = 100 * positions[1] + positions[2];
 			if (output == 19690720)
 				Console.WriteLine(grav);
 
