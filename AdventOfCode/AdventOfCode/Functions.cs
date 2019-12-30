@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Drawing;
 using System.Windows;
@@ -133,6 +133,24 @@ namespace AdventOfCode
 			}
 
 			return wire;
+		}
+
+		//from day 2
+		public static List<long> IntCodeProgram(string path)
+		{
+
+			List<long> positions = new List<long>();
+			using (StreamReader file = new StreamReader(path))
+			{
+				string line = file.ReadToEnd();
+				var pos = line.Split(',');
+				foreach (string p in pos)
+				{
+					positions.Add(Int32.Parse(p));
+					//Console.WriteLine(p);
+				}
+			}
+			return positions;
 		}
 
 		//from day 1
