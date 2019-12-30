@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Drawing;
 using System.Windows;
@@ -101,6 +101,37 @@ namespace AdventOfCode
 				z--;
 
 			SetVelocity(new Vector3D(x, y, z));
+		}
+	}
+
+	//from day 7
+	class Amplifier
+	{
+		public Queue<int> Inputs;
+		public IntCodeComputerLooper PC;
+		public bool Completed = false;
+
+		public Amplifier(Queue<int> inputs)
+		{
+			Inputs = inputs;
+		}
+
+		public Amplifier(Queue<int> inputs, List<long> instructions)
+		{
+			Inputs = inputs;
+			PC=new IntCodeComputerLooper(instructions);
+			PC.Inputs = inputs;
+		}
+
+		public Queue<int> GetInputs()
+		{
+			return Inputs;
+		}
+
+		public void Continue(int input)
+		{
+			PC.Pause = false;
+			Inputs.Enqueue(input);
 		}
 	}
 
