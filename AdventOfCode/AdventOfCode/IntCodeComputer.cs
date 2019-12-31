@@ -96,51 +96,55 @@ namespace AdventOfCode
 
 		public OpCode Run(bool loop)
 		{
-			string opcode = PC.GetAddress(Pointer).ToString();
-			Operator op = GetOperator(opcode);
-			List<Parameter> parameters = GetParameters(op, opcode);
-			int nextOp = op.ParamCount + 1;
-			Pointer += nextOp;
-
-			switch (op.OpCode)
+			do
 			{
-				case OpCode.Add:
-					Add(parameters);
-					break;
-				case OpCode.Multiply:
-					Multiply(parameters);
-					break;
-				case OpCode.Input:
-					Input(parameters[0]);
-					break;
-				case OpCode.Output:
-					Output(parameters[0]);
-					break;
-				case OpCode.JumpTrue:
-					JumpTrue(parameters);
-					break;
-				case OpCode.JumpFalse:
-					JumpFalse(parameters);
-					break;
-				case OpCode.LessThan:
-					LessThan(parameters);
-					break;
-				case OpCode.EqualTo:
-					EqualTo(parameters);
-					break;
-				case OpCode.SetBase:
-					SetBase(parameters[0]);
-					break;
-				case OpCode.Halt:
-					//loop = false;
-					return op.OpCode;
-				default: break;
-			}
+				string opcode = PC.GetAddress(Pointer).ToString();
+				Operator op = GetOperator(opcode);
+				List<Parameter> parameters = GetParameters(op, opcode);
+				int nextOp = op.ParamCount + 1;
+				Pointer += nextOp;
 
-			if (loop)
-				return Run(loop);
-			else
-				return op.OpCode;
+				switch (op.OpCode)
+				{
+					case OpCode.Add:
+						Add(parameters);
+						break;
+					case OpCode.Multiply:
+						Multiply(parameters);
+						break;
+					case OpCode.Input:
+						Input(parameters[0]);
+						break;
+					case OpCode.Output:
+						Output(parameters[0]);
+						break;
+					case OpCode.JumpTrue:
+						JumpTrue(parameters);
+						break;
+					case OpCode.JumpFalse:
+						JumpFalse(parameters);
+						break;
+					case OpCode.LessThan:
+						LessThan(parameters);
+						break;
+					case OpCode.EqualTo:
+						EqualTo(parameters);
+						break;
+					case OpCode.SetBase:
+						SetBase(parameters[0]);
+						break;
+					case OpCode.Halt:
+						//loop = false;
+						return op.OpCode;
+					default: break;
+				}
+			}
+			while (loop);
+			return OpCode.Halt;
+			//if (loop)
+			//	return Run(loop);
+			//else
+			//	return op.OpCode;
 		}
 
 		public void Add(List<Parameter> param)

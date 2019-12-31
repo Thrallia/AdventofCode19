@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Drawing;
+//using System.Drawing;
 using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
@@ -146,7 +146,7 @@ namespace AdventOfCode
 				var pos = line.Split(',');
 				foreach (string p in pos)
 				{
-					positions.Add(Int32.Parse(p));
+					positions.Add(Int64.Parse(p));
 					//Console.WriteLine(p);
 				}
 			}

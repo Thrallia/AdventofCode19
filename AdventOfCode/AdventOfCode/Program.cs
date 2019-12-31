@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Drawing;
+//using System.Drawing;
 using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +23,18 @@ namespace AdventOfCode
 			//AoC6(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC6.txt");
 			//AoC7(@"C:\develop\AdventofCode\inputs\AoC7.txt");
 			//AoC8(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC8.txt");
-			AoC9(@"C:\develop\AdventofCode\inputs\AoC9test2.txt");
+			//AoC9(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC9.txt");
+			AoC11(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC11.txt");
 			//AoC12(@"C:\Users\Thrallia\Documents\Github\AdventofCode19\AdventOfCode\inputs\AoC12.txt");
+		}
+
+		private static void AoC11(string path)
+		{
+			List<long> positions = Functions.IntCodeProgram(path);
+			IntCodeComputer PC = new IntCodeComputer(positions);
+
+			Console.WriteLine();
+			Console.ReadKey();
 		}
 
 		private static void AoC9(string path)
@@ -548,13 +558,13 @@ namespace AdventOfCode
 			}
 		}
 
-		private static void AoC5(string path)
-		{
-			List<long> positions = Functions.IntCodeProgram(path);
-			IntCodeComputer(positions);
+		//private static void AoC5(string path)
+		//{
+		//	List<long> positions = Functions.IntCodeProgram(path);
+		//	IntCodeComputer(positions);
 
-			Console.ReadKey();
-		}
+		//	Console.ReadKey();
+		//}
 
 		private static void AoC4(int min, int max)
 		{
@@ -622,20 +632,20 @@ namespace AdventOfCode
 			Console.ReadKey();
 		}
 
-		private static void AoC2(string path)
-		{
-			List<long> positions = Functions.IntCodeProgram(path);
+		//private static void AoC2(string path)
+		//{
+		//	List<long> positions = Functions.IntCodeProgram(path);
 
-			int output = IntCodeComputer(positions);
+		//	int output = IntCodeComputer(positions);
 
-			long grav = 100 * positions[1] + positions[2];
-			if (output == 19690720)
-				Console.WriteLine(grav);
+		//	long grav = 100 * positions[1] + positions[2];
+		//	if (output == 19690720)
+		//		Console.WriteLine(grav);
 
-			Console.WriteLine("address 0: " + output);
-			Console.WriteLine("gravity assist: " + grav);
-			Console.ReadKey();
-		}
+		//	Console.WriteLine("address 0: " + output);
+		//	Console.WriteLine("gravity assist: " + grav);
+		//	Console.ReadKey();
+		//}
 
 		private static void Aoc1(string path)
 		{

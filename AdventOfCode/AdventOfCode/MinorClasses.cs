@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Drawing;
+//using System.Drawing;
 using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,6 +104,60 @@ namespace AdventOfCode
 		}
 	}
 
+	//from day 11
+	class Panel
+	{
+		Point coordinates;
+		bool painted;
+		PaintColors Color;
+		enum PaintColors
+		{
+			Black,
+			White
+		}
+
+		public Panel(Point coord, bool paint, int color)
+		{
+			coordinates = coord;
+			painted = paint;
+			Color = (PaintColors)color;
+		}
+
+		public Panel(Point coord, bool paint)
+		{
+			coordinates = coord;
+			painted = paint;
+			Color = PaintColors.Black;
+		}
+
+		public Panel(Point coord)
+		{
+			coordinates = coord;
+			painted = false;
+			Color = PaintColors.Black;
+		}
+	}
+
+	class Robot
+	{
+		enum Direction
+		{
+			Up,
+			Right,
+			Down,
+			Left
+		}
+		Vector direction;
+		IntCodeComputerLooper cpu;
+		Panel currentPanel;
+		Point location;
+
+		public Robot(List<long> instructions)
+		{
+			cpu = new IntCodeComputerLooper(instructions);
+		}
+	}
+
 	//from day 7
 	class Amplifier
 	{
@@ -119,7 +173,7 @@ namespace AdventOfCode
 		public Amplifier(Queue<int> inputs, List<long> instructions)
 		{
 			Inputs = inputs;
-			PC=new IntCodeComputerLooper(instructions);
+			PC = new IntCodeComputerLooper(instructions);
 			PC.Inputs = inputs;
 		}
 
